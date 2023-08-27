@@ -1,0 +1,324 @@
+# script that will be the forecast
+
+# import modules
+import arcpy
+from arcpy.sa import *
+from datetime import timedelta
+from datetime import datetime as dt
+print("modules imported")
+
+# establish master parameters
+print("establishing parameters ... ")
+arcpy.env.workspace = "C:\\Users\\Emma Tyrrell\\Documents\\PSU_SDS\\THESIS_230226\\Data\\WorkingData"
+gdbName = "C:\\Users\\Emma Tyrrell\\Documents\\PSU_SDS\\THESIS_230226\\Data\\StaticDataGDB.gdb"
+HRRRData = "C:\\Users\\Emma Tyrrell\\Documents\\PSU_SDS\\THESIS_230226\\Data\\WorkingData\\HRRRData"
+forecastGDB = "C:\\Users\\Emma Tyrrell\\Documents\\PSU_SDS\\THESIS_230226\\Data\\WorkingData\\ForecastData.gdb"
+forecastingWorkspace = arcpy.env.workspace + "\\ForecastingData"
+GCSsr = arcpy.SpatialReference(4326)
+PCSsr = arcpy.SpatialReference(6431)
+arcpy.env.overwriteOutput = True
+arcpy.env.qualifiedFieldNames = False
+UTCtimeConversion = timedelta(hours=-7)
+avalanchePolygonPaths = "C:\\Users\\Emma Tyrrell\\Documents\\PSU_SDS\\THESIS_230226\\Data\\WorkingData\\AvalancheFiles.gdb\\AvyPathPolygons"
+print("parameters established.")
+
+# get parameters as text
+
+# sample variables
+date = "2022-02-23"
+date_object = dt.strptime(date, "%Y-%m-%d")
+startPoint = date_object + UTCtimeConversion
+endDay0 = startPoint + timedelta(days=1)
+startDay1 = startPoint + timedelta(days=-1)
+startDay2 = startPoint + timedelta(days=-2)
+startDay3 = startPoint + timedelta(days=-3)
+startDay4 = startPoint + timedelta(days=-4)
+startDay5 = startPoint + timedelta(days=-5)
+startDay6 = startPoint + timedelta(days=-6)
+startDay7 = startPoint + timedelta(days=-7)
+startPoint_HRRR = (str(startPoint).replace(" ", "T"))
+endDay0_HRRR = (str(endDay0).replace(" ", "T"))
+startDay1_HRRR = (str(startDay1).replace(" ", "T"))
+startDay2_HRRR = (str(startDay2).replace(" ", "T"))
+startDay3_HRRR = (str(startDay3).replace(" ", "T"))
+startDay4_HRRR = (str(startDay4).replace(" ", "T"))
+startDay5_HRRR = (str(startDay5).replace(" ", "T"))
+startDay6_HRRR = (str(startDay6).replace(" ", "T"))
+startDay7_HRRR = (str(startDay7).replace(" ", "T"))
+print("date prepared for sampling")
+
+# snow sum
+try:
+    # make snow file
+    try:
+        # sample day of
+        Sample(HRRRData + "\\2022\\2022snowSumAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\SnowSample_day0",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startPoint_HRRR} {endDay0_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\SnowSample_day0", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\SnowSample_day0", "asnow_sfc", "asnow_D0", "asnow_D0")
+        print("day 0 snow sampled")
+
+        # sample day 1
+        Sample(HRRRData + "\\2022\\2022snowSumAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\SnowSample_day1",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f'StdTime {startDay1_HRRR} {startPoint_HRRR}', "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\SnowSample_day1", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\SnowSample_day1", "asnow_sfc", "asnow_D1", "asnow_D1")
+        print("day 1 snow sampled")
+
+        # sample day 2 out
+        Sample(HRRRData + "\\2022\\2022snowSumAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\SnowSample_day2",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f'StdTime {startDay2_HRRR} {startDay1_HRRR}', "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\SnowSample_day2", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\SnowSample_day2", "asnow_sfc", "asnow_D2", "asnow_D2")
+        print("day 2 snow sampled")
+
+        # sample day 3 out
+        Sample(HRRRData + "\\2022\\2022snowSumAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\SnowSample_day3",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f'StdTime {startDay3_HRRR} {startDay2_HRRR}', "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\SnowSample_day3", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\SnowSample_day3", "asnow_sfc", "asnow_D3", "asnow_D3")
+        print("day 3 snow sampled")
+
+        # sample day 4 out
+        Sample(HRRRData + "\\2022\\2022snowSumAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\SnowSample_day4",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f'StdTime {startDay4_HRRR} {startDay3_HRRR}', "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\SnowSample_day4", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\SnowSample_day4", "asnow_sfc", "asnow_D4", "asnow_D4")
+        print("day 4 snow sampled")
+
+        # sample day 5 out
+        Sample(HRRRData + "\\2022\\2022snowSumAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\SnowSample_day5",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f'StdTime {startDay5_HRRR} {startDay4_HRRR}', "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\SnowSample_day5", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\SnowSample_day5", "asnow_sfc", "asnow_D5", "asnow_D5")
+        print("day 5 snow sampled")
+
+        # sample day 6 out
+        Sample(HRRRData + "\\2022\\2022snowSumAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\SnowSample_day6",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f'StdTime {startDay6_HRRR} {startDay5_HRRR}', "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\SnowSample_day6", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\SnowSample_day6", "asnow_sfc", "asnow_D6", "asnow_D6")
+        print("day 6 snow sampled")
+
+        # sample day 7 out
+        Sample(HRRRData + "\\2022\\2022snowSumAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\SnowSample_day7",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f'StdTime {startDay7_HRRR} {startDay6_HRRR}', "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\SnowSample_day7", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        arcpy.AlterField_management(forecastGDB + "\\SnowSample_day7", "asnow_sfc", "asnow_D7", "asnow_D7")
+        print("day 7 snow sampled")
+
+        # merge all files and delete intermediaries
+        arcpy.CopyFeatures_management(forecastGDB + "\\SnowSample_day0", forecastGDB + "\\snowData")
+        print("field copied")
+
+        # add fields
+        arcpy.JoinField_management(forecastGDB + "\\snowData", "pathCode", forecastGDB + "\\SnowSample_day1", "pathCode", "asnow_D1")
+        arcpy.JoinField_management(forecastGDB + "\\snowData", "pathCode", forecastGDB + "\\SnowSample_day2", "pathCode", "asnow_D2")
+        arcpy.JoinField_management(forecastGDB + "\\snowData", "pathCode", forecastGDB + "\\SnowSample_day3", "pathCode", "asnow_D3")
+        arcpy.JoinField_management(forecastGDB + "\\snowData", "pathCode", forecastGDB + "\\SnowSample_day4", "pathCode", "asnow_D4")
+        arcpy.JoinField_management(forecastGDB + "\\snowData", "pathCode", forecastGDB + "\\SnowSample_day5", "pathCode", "asnow_D5")
+        arcpy.JoinField_management(forecastGDB + "\\snowData", "pathCode", forecastGDB + "\\SnowSample_day6", "pathCode", "asnow_D6")
+        arcpy.JoinField_management(forecastGDB + "\\snowData", "pathCode", forecastGDB + "\\SnowSample_day7", "pathCode", "asnow_D7")
+        print("files merged")
+
+        arcpy.Delete_management([forecastGDB + "\\SnowSample_day0", forecastGDB + "\\SnowSample_day1",
+                                forecastGDB + "\\SnowSample_day2", forecastGDB + "\\SnowSample_day3",
+                                forecastGDB + "\\SnowSample_day4", forecastGDB + "\\SnowSample_day5",
+                                forecastGDB + "\\SnowSample_day6", forecastGDB + "\\SnowSample_day7"])
+        print("intermediary files deleted")
+    except Exception as ex:
+        print(ex)
+
+    # select for asnow that > 1
+    try:
+        asnow0 = arcpy.SelectLayerByAttribute_management(forecastGDB + "\\snowData", "NEW_SELECTION", '"asnow_D0" >= 1')
+        arcpy.SelectLayerByAttribute_management(asnow0, "SUBSET_SELECTION", '"asnow_D1" >= 1')
+        arcpy.CopyFeatures_management(asnow0, forecastGDB + "\\HighSnowData")
+        print("snow selection done")
+    except Exception as ex:
+        print(ex)
+except Exception as ex:
+    print(ex)
+
+# wind mean
+try:
+    try:
+        # sample day of
+        Sample(HRRRData + "\\2022\\2022windMeanAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\WindSample_day0",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startPoint_HRRR} {endDay0_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\WindSample_day0", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\WindSample_day0", "wind_htgl", "wind_D0", "wind_D0")
+        print("day 0 wind sampled")
+
+        # sample day 1
+        Sample(HRRRData + "\\2022\\2022windMeanAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\WindSample_day1",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startDay1_HRRR} {startPoint_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\WindSample_day1", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\WindSample_day1", "wind_htgl", "wind_D1", "wind_D1")
+        print("day 1 wind sampled")
+
+        # sample day 2
+        Sample(HRRRData + "\\2022\\2022windMeanAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\WindSample_day2",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startDay2_HRRR} {startDay1_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\WindSample_day2", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\WindSample_day2", "wind_htgl", "wind_D2", "wind_D2")
+        print("day 2 wind sampled")
+
+        # sample day 3
+        Sample(HRRRData + "\\2022\\2022windMeanAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\WindSample_day3",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startDay3_HRRR} {startDay2_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\WindSample_day3", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\WindSample_day3", "wind_htgl", "wind_D3", "wind_D3")
+        print("day 3 wind sampled")
+
+        # sample day 4
+        Sample(HRRRData + "\\2022\\2022windMeanAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\WindSample_day4",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startDay4_HRRR} {startDay3_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\WindSample_day4", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\WindSample_day4", "wind_htgl", "wind_D4", "wind_D4")
+        print("day 4 wind sampled")
+
+        # sample day 5
+        Sample(HRRRData + "\\2022\\2022windMeanAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\WindSample_day5",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startDay5_HRRR} {startDay4_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\WindSample_day5", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\WindSample_day5", "wind_htgl", "wind_D5", "wind_D5")
+        print("day 5 wind sampled")
+
+        # sample day 6
+        Sample(HRRRData + "\\2022\\2022windMeanAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\WindSample_day6",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startDay6_HRRR} {startDay5_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\WindSample_day6", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\WindSample_day6", "wind_htgl", "wind_D6", "wind_D6")
+        print("day 6 wind sampled")
+
+        # sample day 7
+        Sample(HRRRData + "\\2022\\2022windMeanAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\WindSample_day7",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startDay7_HRRR} {startDay6_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\WindSample_day7", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # change field
+        arcpy.AlterField_management(forecastGDB + "\\WindSample_day7", "wind_htgl", "wind_D7", "wind_D7")
+        print("day 7 wind sampled")
+
+        # merge all files and delete intermediaries
+        arcpy.CopyFeatures_management(forecastGDB + "\\HighSnowData", forecastGDB + "\\windAndSnowData")
+        print("field copied")
+
+        # add fields
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day0",
+                                   "pathCode", "wind_D0")
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day1",
+                                   "pathCode", "wind_D1")
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day1",
+                                   "pathCode", "wind_D1")
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day2",
+                                   "pathCode", "wind_D2")
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day3",
+                                   "pathCode", "wind_D3")
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day4",
+                                   "pathCode", "wind_D4")
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day5",
+                                   "pathCode", "wind_D5")
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day6",
+                                   "pathCode", "wind_D6")
+        arcpy.JoinField_management(forecastGDB + "\\windAndSnowData", "pathCode", forecastGDB + "\\WindSample_day7",
+                                   "pathCode", "wind_D7")
+        print("files merged")
+
+        arcpy.Delete_management([forecastGDB + "\\WindSample_day0", forecastGDB + "\\WindSample_day1",
+                                 forecastGDB + "\\WindSample_day2", forecastGDB + "\\WindSample_day3",
+                                 forecastGDB + "\\WindSample_day4", forecastGDB + "\\WindSample_day5",
+                                 forecastGDB + "\\WindSample_day6", forecastGDB + "\\WindSample_day7"])
+        print("intermediary files deleted")
+    except Exception as ex:
+        print(ex)
+
+    try:
+        wind0 = arcpy.SelectLayerByAttribute_management(forecastGDB + "\\windAndSnowData", "NEW_SELECTION", '"wind_D0" >= 7')
+        arcpy.SelectLayerByAttribute_management(wind0, "SUBSET_SELECTION", '"wind_D1" >= 7')
+        arcpy.CopyFeatures_management(wind0, forecastGDB + "\\HighMeanWindHighSnowData")
+    except Exception as ex:
+        print(ex)
+except Exception as ex:
+    print(ex)
+
+# max gust
+try:
+    try:
+        # sample day of
+        Sample(HRRRData + "\\2022\\2022gustMaxAggregate.crf", avalanchePolygonPaths, forecastGDB + "\\GustSample_day0",
+               "NEAREST", "OBJECTID", "ALL_SLICES", f"StdTime {startPoint_HRRR} {endDay0_HRRR}", "MEAN", "", "",
+               "ROW_WISE", "FEATURE_CLASS")
+        # join path code and name
+        arcpy.JoinField_management(forecastGDB + "\\GustSample_day0", "OBJECTID", avalanchePolygonPaths, "OBJECTID",
+                                   "pathCode")
+        # # change field
+        # arcpy.AlterField_management(forecastGDB + "\\GustSample_day0", "gust_htgl", "wind_D0", "wind_D0")
+        # print("day 0 wind sampled")
+    except Exception as ex:
+        print(ex)
+
+except Exception as ex:
+    print(ex)
